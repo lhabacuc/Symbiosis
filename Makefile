@@ -10,7 +10,8 @@ SRC = src/main.cpp \
       src/SerVivo.cpp \
       src/Bacteria.cpp \
       src/Visualizer.cpp \
-      src/Simulation.cpp
+      src/Simulation.cpp \
+      src/Mapa.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

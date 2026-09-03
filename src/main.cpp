@@ -1,17 +1,31 @@
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 #include "Bacteria.hpp"
 #include "Visualizer.hpp"
 #include "Simulation.hpp"
+#include "Mapa.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
     srand((unsigned int)time(nullptr));
 
-    Visualizer visualizer(800, 600, "Symbiosis");
-    Simulation simulation(visualizer, 50);
+    std::string mapaPath = (argc > 1) ? argv[1] : "maps/default.sy";
 
-    visualizer.loopHook(&Simulation::loopCallback, &simulation);
-    visualizer.run();
+    try
+    {
+        Mapa mapa(mapaPath);
+        Visualizer visualizer(mapa.getWidth(), mapa.getHeight(), "Symbiosis");
+        Simulation simulation(visualizer, mapa);
+
+        visualizer.loopHook(&Simulation::loopCallback, &simulation);
+        visualizer.run();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Erro: " << e.what() << std::endl;
+        return 1;
+    }
+
     return 0;
 }

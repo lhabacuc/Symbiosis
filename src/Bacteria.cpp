@@ -1,7 +1,7 @@
 #include "Bacteria.hpp"
 
 Bacteria::Bacteria(int x, int y)
-    : SerVivo(x, y), geneVelocidade(1.0f), geneRaioVisao(1.0f), genePreferencia(0.5f)
+    : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f)
 {
 }
 
@@ -79,8 +79,11 @@ void Bacteria::viver()
     float custoEnergia = 1.0f + (geneVelocidade * 1.5f) + (geneRaioVisao * 0.5f) + custoPreferencia;
     setEnergy(getEnergy() - custoEnergia);
 
-    x += (int)(((rand() % 3) - 1) * geneVelocidade);
-    y += (int)(((rand() % 3) - 1) * geneVelocidade);
+    int passo = (int)(geneVelocidade * 10.0f);
+    if (passo < 2)
+        passo = 2;
+    x += ((rand() % 3) - 1) * passo;
+    y += ((rand() % 3) - 1) * passo;
 }
 
 void Bacteria::interagirComItem(TipoItem item)
