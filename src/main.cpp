@@ -15,7 +15,8 @@ int main(int argc, char **argv)
     try
     {
         Mapa mapa(mapaPath);
-        Visualizer visualizer(mapa.getWidth() + Simulation::SIDEBAR_WIDTH, mapa.getHeight(), "Symbiosis");
+        int altura = mapa.getHeight() > Simulation::PANEL_MIN_HEIGHT ? mapa.getHeight() : Simulation::PANEL_MIN_HEIGHT;
+        Visualizer visualizer(mapa.getWidth() + Simulation::SIDEBAR_WIDTH, altura, "Symbiosis");
         Simulation simulation(visualizer, mapa);
 
         while (!visualizer.shouldClose())

@@ -8,7 +8,7 @@
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
       _pausado(false), _velocidadeMs(50.0f),
-      _energiaInicial(90.0f), _custoEnergiaMult(0.45f), _valorComida(10.0f),
+      _energiaInicial(90.0f), _custoEnergiaMult(45.0f), _valorComida(10.0f),
       _danoVeneno(6.0f), _limiteReproducao(130.0f), _acumulador(0.0f)
 {
     _configBacterias = static_cast<float>(mapa.getBacterias().size());
@@ -111,7 +111,7 @@ void Simulation::sincronizarPopulacao()
     if (atual < alvo)
         spawnBacterias(alvo - atual);
     else if (atual > alvo)
-        _bacterias.resize(static_cast<size_t>(alvo));
+        _bacterias.erase(_bacterias.begin() + alvo, _bacterias.end());
 }
 
 void Simulation::reiniciar()
@@ -137,7 +137,7 @@ void Simulation::update()
 {
     for (size_t i = 0; i < _bacterias.size(); i++)
     {
-        _bacterias[i].envelhecer(_custoEnergiaMult);
+        _bacterias[i].envelhecer(_custoEnergiaMult / 100.0f);
 
         float raio = _bacterias[i].getRaioVisaoPixels();
         float raio2 = raio * raio;
@@ -304,7 +304,7 @@ void Simulation::drawUI()
     drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 300.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Custo de energia x10", &_custoEnergiaMult, 1.0f, 30.0f, "");
+    drawSlider(px, y, panelW, "Custo de energia", &_custoEnergiaMult, 5.0f, 300.0f, "%");
     y += 54;
 
     drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 50.0f, "");
