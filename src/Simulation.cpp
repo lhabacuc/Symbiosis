@@ -51,11 +51,11 @@ void Simulation::draw()
 
         int x = b.getX();
         int y = b.getY();
-        _viz.putPixel(x, y, color);
-        _viz.putPixel(x + 1, y, color);
-        _viz.putPixel(x, y + 1, color);
-        _viz.putPixel(x + 1, y + 1, color);
+        for (int dy = 0; dy < 4; dy++)
+            for (int dx = 0; dx < 4; dx++)
+                _viz.putPixel(x + dx, y + dy, color);
     }
+    _viz.render();
 }
 
 void Simulation::tick()
