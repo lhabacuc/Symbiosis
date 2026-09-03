@@ -18,9 +18,8 @@ int main(int argc, char **argv)
         Visualizer visualizer(mapa.getWidth() + Simulation::SIDEBAR_WIDTH, mapa.getHeight(), "Symbiosis");
         Simulation simulation(visualizer, mapa);
 
-        visualizer.loopHook(&Simulation::loopCallback, &simulation);
-        visualizer.mouseHook(&Simulation::mouseCallback, &simulation);
-        visualizer.run();
+        while (!visualizer.shouldClose())
+            simulation.tick();
     }
     catch (const std::exception &e)
     {

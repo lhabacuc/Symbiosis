@@ -1,23 +1,14 @@
 #ifndef VISUALIZER_HPP
 # define VISUALIZER_HPP
 
-extern "C"
-{
-# include "mlx.h"
-}
+# include "raylib.h"
 
 class Visualizer
 {
     private:
-        void    *_mlx;
-        void    *_win;
-        void    *_img;
-        char    *_imgData;
-        int     _width;
-        int     _height;
-        int     _bpp;
-        int     _lineLen;
-        int     _endian;
+        int      _width;
+        int      _height;
+        Camera2D _camera;
 
     public:
         Visualizer(int width, int height, const char *title);
@@ -27,15 +18,26 @@ class Visualizer
 
         int getWidth() const;
         int getHeight() const;
-        void clear();
-        void putPixel(int x, int y, int color);
-        void drawRect(int x, int y, int w, int h, int color);
-        void drawText(int x, int y, int color, const char *text);
-        void render();
-        void loopHook(int (*f)(void *param), void *param);
-        void mouseHook(int (*f)(int button, int x, int y, void *param), void *param);
-        void run();
-        static int closeWindow(void *param);
+
+        bool shouldClose() const;
+        void beginFrame();
+        void endFrame();
+
+        void drawRect(int x, int y, int w, int h, unsigned int colorRGB);
+        void drawText(int x, int y, unsigned int colorRGB, const char *text);
+        void drawLine(int x1, int y1, int x2, int y2, unsigned int colorRGB);
+        void drawBacteria(float x, float y, float radius, unsigned int colorRGB);
+
+        void setCameraCenter(float x, float y);
+        void updateCamera(float regiaoW, float regiaoH);
+        void resetCamera(float regiaoW, float regiaoH);
+        float getCameraZoom() const;
+        void beginScissorCamera(int x, int y, int w, int h);
+        void endScissorCamera();
+
+        bool mouseLeftPressed() const;
+        int getMouseX() const;
+        int getMouseY() const;
 };
 
 #endif

@@ -1,10 +1,10 @@
 NAME = symbiosis
 
-MLX_DIR = minilibx-linux
-MLX_LIB = $(MLX_DIR)/libmlx.a
+RAYLIB_DIR = raylib/src
+RAYLIB_LIB = $(RAYLIB_DIR)/libraylib.a
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -I include -I $(MLX_DIR)
+CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -I include -I $(RAYLIB_DIR)
 
 SRC = src/main.cpp \
       src/SerVivo.cpp \
@@ -15,14 +15,14 @@ SRC = src/main.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-LDFLAGS = -L $(MLX_DIR) -lmlx -L/usr/lib -lXext -lX11 -lm
+LDFLAGS = -L $(RAYLIB_DIR) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 all: $(NAME)
 
-$(MLX_LIB):
-	$(MAKE) -C $(MLX_DIR)
+$(RAYLIB_LIB):
+	$(MAKE) -C $(RAYLIB_DIR) PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=STATIC
 
-$(NAME): $(MLX_LIB) $(OBJ)
+$(NAME): $(RAYLIB_LIB) $(OBJ)
 	$(CXX) $(OBJ) $(LDFLAGS) -o $(NAME)
 
 %.o: %.cpp

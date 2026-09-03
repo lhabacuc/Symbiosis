@@ -17,6 +17,11 @@ class Bacteria : public SerVivo
         Bacteria(const Bacteria &other, float genePreference);
         Bacteria(int posX, int posY, float maeVelocidade, float maeVisao, float maePreferencia);
         void viver();
+        void envelhecer(float custoMultiplicador = 1.0f);
+        void moverAleatorio();
+        void moverPara(int tx, int ty);
+        int getPasso() const;
+        float getRaioVisaoPixels() const;
         Bacteria divide();
         float getPreference() const;
         bool podeSeDividir() const;

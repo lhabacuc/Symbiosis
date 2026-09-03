@@ -13,32 +13,11 @@ struct Item
     int y;
 };
 
-enum Acao
-{
-    ACAO_PAUSA,
-    ACAO_RESET,
-    ACAO_LIMPAR,
-    ACAO_BACTERIA_MENOS,
-    ACAO_BACTERIA_MAIS,
-    ACAO_COMIDA_MENOS,
-    ACAO_COMIDA_MAIS,
-    ACAO_VENENO_MENOS,
-    ACAO_VENENO_MAIS,
-    ACAO_VELOCIDADE_MENOS,
-    ACAO_VELOCIDADE_MAIS
-};
-
-struct Botao
-{
-    int x1, y1, x2, y2;
-    Acao acao;
-    std::string label;
-};
-
 class Simulation
 {
     public:
-        static constexpr int SIDEBAR_WIDTH = 240;
+        static constexpr int SIDEBAR_WIDTH = 320;
+        static constexpr int PANEL_MIN_HEIGHT = 940;
 
     private:
         Visualizer              &_viz;
@@ -48,16 +27,26 @@ class Simulation
         std::vector<Bacteria>    _bacterias;
         std::vector<Item>        _comida;
         std::vector<Item>        _veneno;
-        std::vector<Botao>       _botoes;
 
         bool                     _pausado;
-        int                      _configBacterias;
-        int                      _configComida;
-        int                      _configVeneno;
-        int                      _tickDelayUs;
 
-        void construirUI();
-        void handleClick(int x, int y);
+        // populacao / ambiente (aplicados em tempo real)
+        float                    _configBacterias;
+        float                    _configComida;
+        float                    _configVeneno;
+        float                    _velocidadeMs;
+
+        // caracteristicas das bacterias (aplicados em tempo real)
+        float                    _energiaInicial;
+        float                    _custoEnergiaMult;
+        float                    _valorComida;
+        float                    _danoVeneno;
+        float                    _limiteReproducao;
+
+        float                    _acumulador;
+
+        void aplicarEstilo();
+        void sincronizarPopulacao();
 
         void spawnComida(int n);
         void spawnVeneno(int n);
@@ -68,13 +57,12 @@ class Simulation
         void update();
         void draw();
         void drawUI();
+        void drawSlider(float x, float y, float w, const char *label, float *value, float minV, float maxV, const char *suffix);
 
     public:
         Simulation(Visualizer &viz, const Mapa &mapa);
 
         void tick();
-        static int loopCallback(void *param);
-        static int mouseCallback(int button, int x, int y, void *param);
 };
 
 #endif

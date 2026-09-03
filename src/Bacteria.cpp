@@ -1,4 +1,5 @@
 #include "Bacteria.hpp"
+#include <algorithm>
 
 Bacteria::Bacteria(int x, int y)
     : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f)
@@ -71,19 +72,56 @@ bool Bacteria::podeSeDividir() const
     return getEnergy() > LIMITE_REPRODUCAO;
 }
 
-void Bacteria::viver()
+void Bacteria::envelhecer(float custoMultiplicador)
 {
     setIdade(getIdade() + 1);
 
     float custoPreferencia = genePreferencia * 0.2f;
-    float custoEnergia = 1.0f + (geneVelocidade * 1.5f) + (geneRaioVisao * 0.5f) + custoPreferencia;
+    float custoEnergia = (1.0f + (geneVelocidade * 1.5f) + (geneRaioVisao * 0.5f) + custoPreferencia) * custoMultiplicador;
     setEnergy(getEnergy() - custoEnergia);
+}
 
+int Bacteria::getPasso() const
+{
     int passo = (int)(geneVelocidade * 10.0f);
     if (passo < 2)
         passo = 2;
+    return passo;
+}
+
+void Bacteria::moverAleatorio()
+{
+    int passo = getPasso();
     x += ((rand() % 3) - 1) * passo;
     y += ((rand() % 3) - 1) * passo;
+}
+
+void Bacteria::moverPara(int tx, int ty)
+{
+    int passo = getPasso();
+    int dx = tx - x;
+    int dy = ty - y;
+
+    if (dx > 0)
+        x += std::min(passo, dx);
+    else if (dx < 0)
+        x += std::max(-passo, dx);
+
+    if (dy > 0)
+        y += std::min(passo, dy);
+    else if (dy < 0)
+        y += std::max(-passo, dy);
+}
+
+float Bacteria::getRaioVisaoPixels() const
+{
+    return geneRaioVisao * 120.0f;
+}
+
+void Bacteria::viver()
+{
+    envelhecer();
+    moverAleatorio();
 }
 
 void Bacteria::interagirComItem(TipoItem item)
