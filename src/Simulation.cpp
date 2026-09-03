@@ -1,5 +1,7 @@
 #include "Simulation.hpp"
 #include <cstdlib>
+#include <unistd.h>
+#include <iostream>
 
 Simulation::Simulation(Visualizer &viz, int nBacterias) : _viz(viz)
 {
@@ -8,7 +10,9 @@ Simulation::Simulation(Visualizer &viz, int nBacterias) : _viz(viz)
     {
         int x = rand() % _viz.getWidth();
         int y = rand() % _viz.getHeight();
-        _bacterias.push_back(Bacteria(x, y));
+        Bacteria b(x, y);
+        b.setEnergy(200.0f);
+        _bacterias.push_back(b);
     }
 }
 
@@ -60,8 +64,10 @@ void Simulation::draw()
 
 void Simulation::tick()
 {
+    usleep(50000); // ~20 frames por segundo, para a simulacao ser visivel
     update();
     draw();
+    std::cout << "bacterias vivas: " << _bacterias.size() << std::endl;
 }
 
 int Simulation::loopCallback(void *param)
