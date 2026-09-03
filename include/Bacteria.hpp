@@ -22,6 +22,7 @@ class Bacteria : public SerVivo
         void moverAleatorio();
         void moverPreferido();
         void moverPara(int tx, int ty);
+        void empurrar(int dx, int dy);
         int getPasso() const;
         float getRaioVisaoPixels() const;
         Bacteria divide();

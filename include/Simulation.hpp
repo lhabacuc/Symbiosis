@@ -68,6 +68,7 @@ class Simulation
         void limpar();
 
         void update();
+        void resolverSobreposicoes();
         void draw();
         void drawUI();
         void drawSlider(float x, float y, float w, const char *label, float *value, float minV, float maxV, const char *suffix);

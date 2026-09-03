@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cstdio>
+#include <cmath>
 
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
@@ -284,6 +285,8 @@ void Simulation::update()
         }
     }
 
+    resolverSobreposicoes();
+
     if (!_comida.empty())
     {
         std::vector<Item> restante;
@@ -338,6 +341,53 @@ void Simulation::update()
     }
 
     _desenhoDetalhado = _bacterias.size() <= 3000;
+}
+
+void Simulation::resolverSobreposicoes()
+{
+    const float distanciaMinima = 6.0f;
+
+    _gradeBacterias.limpar();
+    for (size_t j = 0; j < _bacterias.size(); j++)
+        _gradeBacterias.inserir(static_cast<int>(j), _bacterias[j].getX(), _bacterias[j].getY());
+
+    for (size_t i = 0; i < _bacterias.size(); i++)
+    {
+        int bx = _bacterias[i].getX();
+        int by = _bacterias[i].getY();
+
+        _gradeBacterias.paraCadaVizinho(bx, by, distanciaMinima, [&](int j)
+        {
+            if (static_cast<size_t>(j) <= i)
+                return;
+
+            float dx = static_cast<float>(bx - _bacterias[j].getX());
+            float dy = static_cast<float>(by - _bacterias[j].getY());
+            float dist = std::sqrt(dx * dx + dy * dy);
+
+            if (dist >= distanciaMinima)
+                return;
+
+            float nx, ny;
+            if (dist < 0.001f)
+            {
+                nx = 1.0f;
+                ny = 0.0f;
+            }
+            else
+            {
+                nx = dx / dist;
+                ny = dy / dist;
+            }
+
+            float sobreposicao = (distanciaMinima - dist) / 2.0f;
+            int px = static_cast<int>(nx * sobreposicao) + (nx > 0 ? 1 : (nx < 0 ? -1 : 0));
+            int py = static_cast<int>(ny * sobreposicao) + (ny > 0 ? 1 : (ny < 0 ? -1 : 0));
+
+            _bacterias[i].empurrar(px, py);
+            _bacterias[j].empurrar(-px, -py);
+        });
+    }
 }
 
 void Simulation::draw()

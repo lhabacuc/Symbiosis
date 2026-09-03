@@ -146,6 +146,12 @@ void Bacteria::moverPara(int tx, int ty)
         y += std::max(-passo, dy);
 }
 
+void Bacteria::empurrar(int dx, int dy)
+{
+    x += dx;
+    y += dy;
+}
+
 float Bacteria::getRaioVisaoPixels() const
 {
     return geneRaioVisao * 120.0f;
