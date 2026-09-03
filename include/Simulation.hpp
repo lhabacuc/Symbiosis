@@ -6,6 +6,7 @@
 # include "Bacteria.hpp"
 # include "Visualizer.hpp"
 # include "Mapa.hpp"
+# include "GradeEspacial.hpp"
 
 struct Item
 {
@@ -27,6 +28,11 @@ class Simulation
         std::vector<Item>        _comida;
         std::vector<Item>        _veneno;
 
+        GradeEspacial            _gradeComida;
+        GradeEspacial            _gradeVeneno;
+        GradeEspacial            _gradeBacterias;
+        bool                     _desenhoDetalhado;
+
         bool                     _pausado;
 
         // populacao / ambiente (aplicados em tempo real)
@@ -42,6 +48,10 @@ class Simulation
         float                    _valorComida;
         float                    _danoVeneno;
         float                    _limiteReproducao;
+
+        bool                     _gregarismo;
+        float                    _raioSocial;
+        float                    _custoSolidao;
 
         float                    _acumulador;
 
