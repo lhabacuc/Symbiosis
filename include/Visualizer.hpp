@@ -29,8 +29,11 @@ class Visualizer
         int getHeight() const;
         void clear();
         void putPixel(int x, int y, int color);
+        void drawRect(int x, int y, int w, int h, int color);
+        void drawText(int x, int y, int color, const char *text);
         void render();
         void loopHook(int (*f)(void *param), void *param);
+        void mouseHook(int (*f)(int button, int x, int y, void *param), void *param);
         void run();
         static int closeWindow(void *param);
 };

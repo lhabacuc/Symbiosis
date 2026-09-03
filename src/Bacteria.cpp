@@ -92,11 +92,9 @@ void Bacteria::interagirComItem(TipoItem item)
     {
         case FOOD:
             setEnergy(getEnergy() + 5.0f);
-            std::cout << "Bacteria at (" << getX() << ", " << getY() << ") ate food. Energy: " << getEnergy() << std::endl;
             break;
         case POISON:
             setEnergy(getEnergy() - 5.0f);
-            std::cout << "Bacteria at (" << getX() << ", " << getY() << ") was poisoned. Energy: " << getEnergy() << std::endl;
             break;
         case NEUTRAL:
             break;

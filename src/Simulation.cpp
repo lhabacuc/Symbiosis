@@ -2,11 +2,19 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <iostream>
+#include <algorithm>
 
-Simulation::Simulation(Visualizer &viz, const Mapa &mapa) : _viz(viz)
+static Simulation *g_instanciaAtual = nullptr;
+
+Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
+    : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
+      _pausado(false), _tickDelayUs(50000)
 {
+    _configBacterias = static_cast<int>(mapa.getBacterias().size());
+    _configComida = static_cast<int>(mapa.getComida().size());
+    _configVeneno = static_cast<int>(mapa.getVeneno().size());
+
     const std::vector<std::pair<int, int> > &bacterias = mapa.getBacterias();
-    _bacterias.reserve(bacterias.size());
     for (size_t i = 0; i < bacterias.size(); i++)
     {
         Bacteria b(bacterias[i].first, bacterias[i].second);
@@ -31,6 +39,37 @@ Simulation::Simulation(Visualizer &viz, const Mapa &mapa) : _viz(viz)
         v.y = veneno[i].second;
         _veneno.push_back(v);
     }
+
+    construirUI();
+    g_instanciaAtual = this;
+}
+
+void Simulation::construirUI()
+{
+    int px = _playWidth + 15;
+    int y = 40;
+    const int rowH = 46;
+
+    _botoes.push_back({px, y, px + 210, y + 30, ACAO_PAUSA, "Pausar / Continuar"});
+    y += rowH;
+    _botoes.push_back({px, y, px + 100, y + 30, ACAO_RESET, "Reiniciar"});
+    _botoes.push_back({px + 110, y, px + 210, y + 30, ACAO_LIMPAR, "Limpar"});
+    y += rowH + 20;
+
+    _botoes.push_back({px, y, px + 30, y + 30, ACAO_BACTERIA_MENOS, "-"});
+    _botoes.push_back({px + 180, y, px + 210, y + 30, ACAO_BACTERIA_MAIS, "+"});
+    y += rowH;
+
+    _botoes.push_back({px, y, px + 30, y + 30, ACAO_COMIDA_MENOS, "-"});
+    _botoes.push_back({px + 180, y, px + 210, y + 30, ACAO_COMIDA_MAIS, "+"});
+    y += rowH;
+
+    _botoes.push_back({px, y, px + 30, y + 30, ACAO_VENENO_MENOS, "-"});
+    _botoes.push_back({px + 180, y, px + 210, y + 30, ACAO_VENENO_MAIS, "+"});
+    y += rowH;
+
+    _botoes.push_back({px, y, px + 30, y + 30, ACAO_VELOCIDADE_MENOS, "-"});
+    _botoes.push_back({px + 180, y, px + 210, y + 30, ACAO_VELOCIDADE_MAIS, "+"});
 }
 
 void Simulation::spawnComida(int n)
@@ -38,8 +77,8 @@ void Simulation::spawnComida(int n)
     for (int i = 0; i < n; i++)
     {
         Item c;
-        c.x = rand() % _viz.getWidth();
-        c.y = rand() % _viz.getHeight();
+        c.x = rand() % _playWidth;
+        c.y = rand() % _playHeight;
         _comida.push_back(c);
     }
 }
@@ -49,9 +88,86 @@ void Simulation::spawnVeneno(int n)
     for (int i = 0; i < n; i++)
     {
         Item v;
-        v.x = rand() % _viz.getWidth();
-        v.y = rand() % _viz.getHeight();
+        v.x = rand() % _playWidth;
+        v.y = rand() % _playHeight;
         _veneno.push_back(v);
+    }
+}
+
+void Simulation::spawnBacterias(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        Bacteria b(rand() % _playWidth, rand() % _playHeight);
+        b.setEnergy(60.0f);
+        _bacterias.push_back(b);
+    }
+}
+
+void Simulation::reiniciar()
+{
+    _bacterias.clear();
+    _comida.clear();
+    _veneno.clear();
+    spawnBacterias(_configBacterias);
+    spawnComida(_configComida);
+    spawnVeneno(_configVeneno);
+    _pausado = false;
+}
+
+void Simulation::limpar()
+{
+    _bacterias.clear();
+    _comida.clear();
+    _veneno.clear();
+    _pausado = true;
+}
+
+void Simulation::handleClick(int x, int y)
+{
+    for (size_t i = 0; i < _botoes.size(); i++)
+    {
+        const Botao &b = _botoes[i];
+        if (x < b.x1 || x > b.x2 || y < b.y1 || y > b.y2)
+            continue;
+
+        switch (b.acao)
+        {
+            case ACAO_PAUSA:
+                _pausado = !_pausado;
+                break;
+            case ACAO_RESET:
+                reiniciar();
+                break;
+            case ACAO_LIMPAR:
+                limpar();
+                break;
+            case ACAO_BACTERIA_MENOS:
+                _configBacterias = std::max(0, _configBacterias - 10);
+                break;
+            case ACAO_BACTERIA_MAIS:
+                _configBacterias += 10;
+                break;
+            case ACAO_COMIDA_MENOS:
+                _configComida = std::max(0, _configComida - 10);
+                break;
+            case ACAO_COMIDA_MAIS:
+                _configComida += 10;
+                break;
+            case ACAO_VENENO_MENOS:
+                _configVeneno = std::max(0, _configVeneno - 5);
+                break;
+            case ACAO_VENENO_MAIS:
+                _configVeneno += 5;
+                break;
+            case ACAO_VELOCIDADE_MENOS:
+                _tickDelayUs = std::min(200000, _tickDelayUs + 10000);
+                break;
+            case ACAO_VELOCIDADE_MAIS:
+                _tickDelayUs = std::max(0, _tickDelayUs - 10000);
+                break;
+        }
+        return;
     }
 }
 
@@ -89,9 +205,9 @@ void Simulation::update()
         }
     }
 
-    if (_comida.size() < 80)
+    if (static_cast<int>(_comida.size()) < _configComida)
         spawnComida(2);
-    if (_veneno.size() < 20 && rand() % 4 == 0)
+    if (static_cast<int>(_veneno.size()) < _configVeneno && rand() % 4 == 0)
         spawnVeneno(1);
 
     for (size_t i = 0; i < _bacterias.size();)
@@ -118,24 +234,10 @@ void Simulation::draw()
     _viz.clear();
 
     for (size_t i = 0; i < _comida.size(); i++)
-    {
-        int x = _comida[i].x;
-        int y = _comida[i].y;
-        _viz.putPixel(x, y, 0xFFFF00);
-        _viz.putPixel(x + 1, y, 0xFFFF00);
-        _viz.putPixel(x, y + 1, 0xFFFF00);
-        _viz.putPixel(x + 1, y + 1, 0xFFFF00);
-    }
+        _viz.drawRect(_comida[i].x, _comida[i].y, 4, 4, 0xFFFF00);
 
     for (size_t i = 0; i < _veneno.size(); i++)
-    {
-        int x = _veneno[i].x;
-        int y = _veneno[i].y;
-        _viz.putPixel(x, y, 0xAA00FF);
-        _viz.putPixel(x + 1, y, 0xAA00FF);
-        _viz.putPixel(x, y + 1, 0xAA00FF);
-        _viz.putPixel(x + 1, y + 1, 0xAA00FF);
-    }
+        _viz.drawRect(_veneno[i].x, _veneno[i].y, 4, 4, 0xAA00FF);
 
     for (size_t i = 0; i < _bacterias.size(); i++)
     {
@@ -146,28 +248,83 @@ void Simulation::draw()
         if (intensidade < 50)
             intensidade = 50;
         int color = (intensidade << 8);
-
-        int x = b.getX();
-        int y = b.getY();
-        for (int dy = 0; dy < 4; dy++)
-            for (int dx = 0; dx < 4; dx++)
-                _viz.putPixel(x + dx, y + dy, color);
+        _viz.drawRect(b.getX(), b.getY(), 4, 4, color);
     }
+
+    _viz.drawRect(_playWidth, 0, 2, _viz.getHeight(), 0x444444);
+
+    drawUI();
+
     _viz.render();
+}
+
+void Simulation::drawUI()
+{
+    for (size_t i = 0; i < _botoes.size(); i++)
+    {
+        const Botao &b = _botoes[i];
+        int cor = 0x336699;
+        if (b.acao == ACAO_LIMPAR)
+            cor = 0x993333;
+        else if (b.acao == ACAO_RESET)
+            cor = 0x339933;
+        _viz.drawRect(b.x1, b.y1, b.x2 - b.x1, b.y2 - b.y1, cor);
+    }
 }
 
 void Simulation::tick()
 {
-    usleep(50000); // ~20 frames por segundo, para a simulacao ser visivel
-    update();
+    usleep(static_cast<useconds_t>(_tickDelayUs));
+    if (!_pausado)
+        update();
     draw();
-    std::cout << "bacterias vivas: " << _bacterias.size() << " | comida: " << _comida.size()
-              << " | veneno: " << _veneno.size() << std::endl;
+
+    int px = _playWidth + 15;
+    _viz.drawText(px, 25, 0xFFFFFF, "SYMBIOSIS - CONTROLOS");
+    _viz.drawText(px + 15, 60, 0xFFFFFF, _pausado ? "PAUSADO" : "A CORRER");
+    _viz.drawText(px + 15, 106, 0xFFFFFF, "Reiniciar");
+    _viz.drawText(px + 125, 106, 0xFFFFFF, "Limpar");
+
+    int y = 40 + 46 + 46 + 20;
+    std::string linha;
+
+    linha = "Bacterias: " + std::to_string(_configBacterias);
+    _viz.drawText(px + 40, y + 20, 0xFFFFFF, linha.c_str());
+    y += 46;
+
+    linha = "Comida: " + std::to_string(_configComida);
+    _viz.drawText(px + 40, y + 20, 0xFFFFFF, linha.c_str());
+    y += 46;
+
+    linha = "Veneno: " + std::to_string(_configVeneno);
+    _viz.drawText(px + 40, y + 20, 0xFFFFFF, linha.c_str());
+    y += 46;
+
+    linha = "Velocidade: " + std::to_string(_tickDelayUs / 1000) + "ms";
+    _viz.drawText(px + 40, y + 20, 0xFFFFFF, linha.c_str());
+    y += 46 + 30;
+
+    linha = "Vivas: " + std::to_string(_bacterias.size());
+    _viz.drawText(px, y, 0x00FF00, linha.c_str());
+    y += 25;
+    linha = "Comida no mapa: " + std::to_string(_comida.size());
+    _viz.drawText(px, y, 0xFFFF00, linha.c_str());
+    y += 25;
+    linha = "Veneno no mapa: " + std::to_string(_veneno.size());
+    _viz.drawText(px, y, 0xAA00FF, linha.c_str());
 }
 
 int Simulation::loopCallback(void *param)
 {
     Simulation *sim = static_cast<Simulation *>(param);
     sim->tick();
+    return 0;
+}
+
+int Simulation::mouseCallback(int button, int x, int y, void *param)
+{
+    Simulation *sim = static_cast<Simulation *>(param);
+    if (button == 1)
+        sim->handleClick(x, y);
     return 0;
 }

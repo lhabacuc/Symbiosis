@@ -15,10 +15,11 @@ int main(int argc, char **argv)
     try
     {
         Mapa mapa(mapaPath);
-        Visualizer visualizer(mapa.getWidth(), mapa.getHeight(), "Symbiosis");
+        Visualizer visualizer(mapa.getWidth() + Simulation::SIDEBAR_WIDTH, mapa.getHeight(), "Symbiosis");
         Simulation simulation(visualizer, mapa);
 
         visualizer.loopHook(&Simulation::loopCallback, &simulation);
+        visualizer.mouseHook(&Simulation::mouseCallback, &simulation);
         visualizer.run();
     }
     catch (const std::exception &e)

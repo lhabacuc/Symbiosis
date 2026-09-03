@@ -52,6 +52,18 @@ void Visualizer::putPixel(int x, int y, int color)
     *reinterpret_cast<int *>(pixel) = color;
 }
 
+void Visualizer::drawRect(int x, int y, int w, int h, int color)
+{
+    for (int j = 0; j < h; j++)
+        for (int i = 0; i < w; i++)
+            putPixel(x + i, y + j, color);
+}
+
+void Visualizer::drawText(int x, int y, int color, const char *text)
+{
+    mlx_string_put(_mlx, _win, x, y, color, const_cast<char *>(text));
+}
+
 void Visualizer::render()
 {
     mlx_put_image_to_window(_mlx, _win, _img, 0, 0);
@@ -60,6 +72,11 @@ void Visualizer::render()
 void Visualizer::loopHook(int (*f)(void *param), void *param)
 {
     mlx_loop_hook(_mlx, (int (*)())f, param);
+}
+
+void Visualizer::mouseHook(int (*f)(int button, int x, int y, void *param), void *param)
+{
+    mlx_mouse_hook(_win, f, param);
 }
 
 void Visualizer::run()
