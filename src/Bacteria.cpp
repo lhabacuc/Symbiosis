@@ -1,19 +1,27 @@
 #include "Bacteria.hpp"
 #include <algorithm>
+#include <cmath>
+
+static float anguloAleatorio()
+{
+    return static_cast<float>(rand() % 628) / 100.0f; // 0 a ~2*PI
+}
 
 Bacteria::Bacteria(int x, int y)
-    : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f)
+    : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f),
+      geneDirecaoPreferida(anguloAleatorio())
 {
 }
 
 Bacteria::Bacteria(const Bacteria &other, float genePreference)
     : SerVivo(other), geneVelocidade(other.geneVelocidade), geneRaioVisao(other.geneRaioVisao),
-      genePreferencia(genePreference)
+      genePreferencia(genePreference), geneDirecaoPreferida(other.geneDirecaoPreferida)
 {
 }
 
 Bacteria::Bacteria(int posX, int posY, float maeVelocidade, float maeVisao, float maePreferencia)
-    : SerVivo(posX, posY), geneVelocidade(maeVelocidade), geneRaioVisao(maeVisao), genePreferencia(maePreferencia)
+    : SerVivo(posX, posY), geneVelocidade(maeVelocidade), geneRaioVisao(maeVisao), genePreferencia(maePreferencia),
+      geneDirecaoPreferida(anguloAleatorio())
 {
     if (rand() % 100 < 15) // 15% de chance de mutacao
     {
@@ -67,17 +75,27 @@ float Bacteria::getGenePreferencia() const
     return genePreferencia;
 }
 
+float Bacteria::getDirecaoPreferida() const
+{
+    return geneDirecaoPreferida;
+}
+
+void Bacteria::setDirecaoPreferida(float direcao)
+{
+    geneDirecaoPreferida = direcao;
+}
+
 bool Bacteria::podeSeDividir() const
 {
     return getEnergy() > LIMITE_REPRODUCAO;
 }
 
-void Bacteria::envelhecer(float custoMultiplicador)
+void Bacteria::envelhecer()
 {
     setIdade(getIdade() + 1);
 
     float custoPreferencia = genePreferencia * 0.2f;
-    float custoEnergia = (1.0f + (geneVelocidade * 1.5f) + (geneRaioVisao * 0.5f) + custoPreferencia) * custoMultiplicador;
+    float custoEnergia = 1.0f + (geneVelocidade * 1.5f) + (geneRaioVisao * 0.5f) + custoPreferencia;
     setEnergy(getEnergy() - custoEnergia);
 }
 
@@ -94,6 +112,21 @@ void Bacteria::moverAleatorio()
     int passo = getPasso();
     x += ((rand() % 3) - 1) * passo;
     y += ((rand() % 3) - 1) * passo;
+}
+
+void Bacteria::moverPreferido()
+{
+    int passo = getPasso();
+
+    // pequena oscilacao para o percurso nao ser uma linha perfeitamente reta
+    float ruido = (static_cast<float>(rand() % 100) / 100.0f - 0.5f) * 0.8f;
+    float angulo = geneDirecaoPreferida + ruido;
+
+    x += static_cast<int>(std::cos(angulo) * passo);
+    y += static_cast<int>(std::sin(angulo) * passo);
+
+    // a direcao preferida vai desviando lentamente, como se explorasse aos poucos
+    geneDirecaoPreferida += (static_cast<float>(rand() % 100) / 100.0f - 0.5f) * 0.1f;
 }
 
 void Bacteria::moverPara(int tx, int ty)
@@ -121,7 +154,7 @@ float Bacteria::getRaioVisaoPixels() const
 void Bacteria::viver()
 {
     envelhecer();
-    moverAleatorio();
+    moverPreferido();
 }
 
 void Bacteria::interagirComItem(TipoItem item)
@@ -141,5 +174,12 @@ void Bacteria::interagirComItem(TipoItem item)
 
 Bacteria Bacteria::divide()
 {
-    return Bacteria(getX(), getY(), geneVelocidade, geneRaioVisao, genePreferencia);
+    Bacteria filha(getX(), getY(), geneVelocidade, geneRaioVisao, genePreferencia);
+
+    float direcao = geneDirecaoPreferida;
+    if (rand() % 100 < 15) // 15% de chance de mutacao na direcao preferida
+        direcao += (static_cast<float>(rand() % 200) - 100.0f) / 100.0f;
+    filha.setDirecaoPreferida(direcao);
+
+    return filha;
 }

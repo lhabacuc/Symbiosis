@@ -9,6 +9,7 @@ class Bacteria : public SerVivo
     float geneVelocidade;
     float geneRaioVisao;
     float genePreferencia;
+    float geneDirecaoPreferida;
 
     static constexpr float LIMITE_REPRODUCAO = 100.0f;
 
@@ -17,8 +18,9 @@ class Bacteria : public SerVivo
         Bacteria(const Bacteria &other, float genePreference);
         Bacteria(int posX, int posY, float maeVelocidade, float maeVisao, float maePreferencia);
         void viver();
-        void envelhecer(float custoMultiplicador = 1.0f);
+        void envelhecer();
         void moverAleatorio();
+        void moverPreferido();
         void moverPara(int tx, int ty);
         int getPasso() const;
         float getRaioVisaoPixels() const;
@@ -28,6 +30,8 @@ class Bacteria : public SerVivo
         float getGeneVelocidade() const;
         float getGeneRaioVisao() const;
         float getGenePreferencia() const;
+        float getDirecaoPreferida() const;
+        void setDirecaoPreferida(float direcao);
         void interagirComItem(TipoItem item);
         void setPreference(float genePreference);
 };

@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-Mapa::Mapa(const std::string &path) : _width(0), _height(0)
+Mapa::Mapa(const std::string &path) : _width(0), _height(0), _bacteriaVida(-1.0f), _bacteriaVidaMaxima(-1.0f)
 {
     std::ifstream file(path);
     if (!file.is_open())
@@ -34,6 +34,14 @@ Mapa::Mapa(const std::string &path) : _width(0), _height(0)
             pendingTipo = "BACTERIA";
             pendingRaio = 0;
             iss >> pendingCount;
+
+            float vida, vidaMaxima;
+            if (iss >> vida)
+            {
+                _bacteriaVida = vida;
+                if (iss >> vidaMaxima)
+                    _bacteriaVidaMaxima = vidaMaxima;
+            }
         }
         else if (tipo == "COMIDA")
         {
@@ -139,4 +147,14 @@ const std::vector<std::pair<int, int> > &Mapa::getComida() const
 const std::vector<std::pair<int, int> > &Mapa::getVeneno() const
 {
     return _veneno;
+}
+
+float Mapa::getBacteriaVida() const
+{
+    return _bacteriaVida;
+}
+
+float Mapa::getBacteriaVidaMaxima() const
+{
+    return _bacteriaVidaMaxima;
 }

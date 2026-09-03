@@ -8,18 +8,25 @@
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
       _pausado(false), _velocidadeMs(50.0f),
-      _energiaInicial(90.0f), _custoEnergiaMult(45.0f), _valorComida(10.0f),
+      _energiaInicial(90.0f), _vidaMaxima(150.0f), _valorComida(10.0f),
       _danoVeneno(6.0f), _limiteReproducao(130.0f), _acumulador(0.0f)
 {
     _configBacterias = static_cast<float>(mapa.getBacterias().size());
     _configComida = static_cast<float>(mapa.getComida().size());
     _configVeneno = static_cast<float>(mapa.getVeneno().size());
+    _ultimoConfigBacterias = _configBacterias;
+
+    if (mapa.getBacteriaVida() >= 0.0f)
+        _energiaInicial = mapa.getBacteriaVida();
+    if (mapa.getBacteriaVidaMaxima() >= 0.0f)
+        _vidaMaxima = mapa.getBacteriaVidaMaxima();
 
     const std::vector<std::pair<int, int> > &bacterias = mapa.getBacterias();
     for (size_t i = 0; i < bacterias.size(); i++)
     {
         Bacteria b(bacterias[i].first, bacterias[i].second);
         b.setEnergy(_energiaInicial);
+        b.setIdadeMaxima(static_cast<int>(_vidaMaxima));
         _bacterias.push_back(b);
     }
 
@@ -99,6 +106,7 @@ void Simulation::spawnBacterias(int n)
     {
         Bacteria b(rand() % _playWidth, rand() % _playHeight);
         b.setEnergy(_energiaInicial);
+        b.setIdadeMaxima(static_cast<int>(_vidaMaxima));
         _bacterias.push_back(b);
     }
 }
@@ -106,12 +114,21 @@ void Simulation::spawnBacterias(int n)
 void Simulation::sincronizarPopulacao()
 {
     int alvo = static_cast<int>(_configBacterias);
-    int atual = static_cast<int>(_bacterias.size());
+    int ultimo = static_cast<int>(_ultimoConfigBacterias);
 
-    if (atual < alvo)
-        spawnBacterias(alvo - atual);
-    else if (atual > alvo)
-        _bacterias.erase(_bacterias.begin() + alvo, _bacterias.end());
+    if (alvo == ultimo)
+        return;
+
+    int delta = alvo - ultimo;
+    if (delta > 0)
+        spawnBacterias(delta);
+    else
+    {
+        int remover = std::min(-delta, static_cast<int>(_bacterias.size()));
+        _bacterias.erase(_bacterias.end() - remover, _bacterias.end());
+    }
+
+    _ultimoConfigBacterias = _configBacterias;
 }
 
 void Simulation::reiniciar()
@@ -122,6 +139,7 @@ void Simulation::reiniciar()
     spawnBacterias(static_cast<int>(_configBacterias));
     spawnComida(static_cast<int>(_configComida));
     spawnVeneno(static_cast<int>(_configVeneno));
+    _ultimoConfigBacterias = _configBacterias;
     _pausado = false;
 }
 
@@ -130,6 +148,7 @@ void Simulation::limpar()
     _bacterias.clear();
     _comida.clear();
     _veneno.clear();
+    _ultimoConfigBacterias = 0.0f;
     _pausado = true;
 }
 
@@ -137,7 +156,7 @@ void Simulation::update()
 {
     for (size_t i = 0; i < _bacterias.size(); i++)
     {
-        _bacterias[i].envelhecer(_custoEnergiaMult / 100.0f);
+        _bacterias[i].envelhecer();
 
         float raio = _bacterias[i].getRaioVisaoPixels();
         float raio2 = raio * raio;
@@ -161,7 +180,7 @@ void Simulation::update()
         if (melhorDist2 >= 0.0f)
             _bacterias[i].moverPara(melhorX, melhorY);
         else
-            _bacterias[i].moverAleatorio();
+            _bacterias[i].moverPreferido();
     }
 
     for (size_t i = 0; i < _bacterias.size(); i++)
@@ -212,7 +231,9 @@ void Simulation::update()
         if (_bacterias[i].getEnergy() > _limiteReproducao)
         {
             _bacterias[i].setEnergy(_bacterias[i].getEnergy() / 2.0f);
-            _bacterias.push_back(_bacterias[i].divide());
+            Bacteria filha = _bacterias[i].divide();
+            filha.setIdadeMaxima(static_cast<int>(_vidaMaxima));
+            _bacterias.push_back(filha);
         }
     }
 }
@@ -304,7 +325,7 @@ void Simulation::drawUI()
     drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 300.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Custo de energia", &_custoEnergiaMult, 5.0f, 300.0f, "%");
+    drawSlider(px, y, panelW, "Vida maxima (idade)", &_vidaMaxima, 20.0f, 1000.0f, "");
     y += 54;
 
     drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 50.0f, "");

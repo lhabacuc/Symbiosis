@@ -14,6 +14,9 @@ class Mapa
         std::vector<std::pair<int, int> >   _comida;
         std::vector<std::pair<int, int> >   _veneno;
 
+        float                                _bacteriaVida;
+        float                                _bacteriaVidaMaxima;
+
         std::pair<int, int> gerarPosicao(const std::string &modo, int raio);
         void gerarBloco(std::vector<std::pair<int, int> > &alvo, int count, const std::string &modo, int raio);
 
@@ -25,6 +28,8 @@ class Mapa
         const std::vector<std::pair<int, int> > &getBacterias() const;
         const std::vector<std::pair<int, int> > &getComida() const;
         const std::vector<std::pair<int, int> > &getVeneno() const;
+        float getBacteriaVida() const;
+        float getBacteriaVidaMaxima() const;
 };
 
 #endif

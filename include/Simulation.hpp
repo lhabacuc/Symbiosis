@@ -32,13 +32,14 @@ class Simulation
 
         // populacao / ambiente (aplicados em tempo real)
         float                    _configBacterias;
+        float                    _ultimoConfigBacterias;
         float                    _configComida;
         float                    _configVeneno;
         float                    _velocidadeMs;
 
         // caracteristicas das bacterias (aplicados em tempo real)
         float                    _energiaInicial;
-        float                    _custoEnergiaMult;
+        float                    _vidaMaxima;
         float                    _valorComida;
         float                    _danoVeneno;
         float                    _limiteReproducao;
