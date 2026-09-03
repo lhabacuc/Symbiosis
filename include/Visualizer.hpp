@@ -1,0 +1,32 @@
+#ifndef VISUALIZER_HPP
+# define VISUALIZER_HPP
+
+extern "C"
+{
+# include "mlx.h"
+}
+
+class Visualizer
+{
+    private:
+        void    *_mlx;
+        void    *_win;
+        int     _width;
+        int     _height;
+
+    public:
+        Visualizer(int width, int height, const char *title);
+        ~Visualizer();
+        Visualizer(const Visualizer &other) = delete;
+        Visualizer &operator=(const Visualizer &other) = delete;
+
+        int getWidth() const;
+        int getHeight() const;
+        void clear();
+        void putPixel(int x, int y, int color);
+        void loopHook(int (*f)(void *param), void *param);
+        void run();
+        static int closeWindow(void *param);
+};
+
+#endif
