@@ -17,7 +17,6 @@ class Simulation
 {
     public:
         static constexpr int SIDEBAR_WIDTH = 320;
-        static constexpr int PANEL_MIN_HEIGHT = 940;
 
     private:
         Visualizer              &_viz;
@@ -45,6 +44,9 @@ class Simulation
         float                    _limiteReproducao;
 
         float                    _acumulador;
+
+        float                    _scrollX;
+        float                    _scrollY;
 
         void aplicarEstilo();
         void sincronizarPopulacao();

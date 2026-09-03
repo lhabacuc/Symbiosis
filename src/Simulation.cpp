@@ -9,7 +9,8 @@ Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
       _pausado(false), _velocidadeMs(50.0f),
       _energiaInicial(90.0f), _vidaMaxima(150.0f), _valorComida(10.0f),
-      _danoVeneno(6.0f), _limiteReproducao(130.0f), _acumulador(0.0f)
+      _danoVeneno(6.0f), _limiteReproducao(130.0f), _acumulador(0.0f),
+      _scrollX(0.0f), _scrollY(0.0f)
 {
     _configBacterias = static_cast<float>(mapa.getBacterias().size());
     _configComida = static_cast<float>(mapa.getComida().size());
@@ -283,15 +284,28 @@ void Simulation::drawSlider(float x, float y, float w, const char *label, float 
 
 void Simulation::drawUI()
 {
-    float px = static_cast<float>(_playWidth) + 20.0f;
-    float panelW = static_cast<float>(SIDEBAR_WIDTH) - 40.0f;
+    const float contentH = 1160.0f;
+
+    Rectangle panelBounds = {static_cast<float>(_playWidth), 0.0f, static_cast<float>(SIDEBAR_WIDTH), static_cast<float>(_viz.getHeight())};
+    Rectangle content = {0.0f, 0.0f, static_cast<float>(SIDEBAR_WIDTH) - 16.0f, contentH};
+    Vector2 scroll = {_scrollX, _scrollY};
+    Rectangle view;
+
+    GuiScrollPanel(panelBounds, nullptr, content, &scroll, &view);
+    _scrollX = scroll.x;
+    _scrollY = scroll.y;
+
+    BeginScissorMode(static_cast<int>(view.x), static_cast<int>(view.y), static_cast<int>(view.width), static_cast<int>(view.height));
+
+    float px = panelBounds.x + scroll.x + 14.0f;
+    float panelW = static_cast<float>(SIDEBAR_WIDTH) - 44.0f;
     char buf[48];
 
-    GuiPanel({static_cast<float>(_playWidth), 0, static_cast<float>(SIDEBAR_WIDTH), static_cast<float>(_viz.getHeight())}, nullptr);
-    _viz.drawText(static_cast<int>(px), 14, 0xFFFFFF, "SYMBIOSIS");
-    GuiLine({px, 42, panelW, 10}, nullptr);
-
-    float y = 58.0f;
+    float y = scroll.y + 10.0f;
+    _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0xFFFFFF, "SYMBIOSIS");
+    y += 28.0f;
+    GuiLine({px, y, panelW, 10}, nullptr);
+    y += 16.0f;
     if (GuiButton({px, y, panelW, 36}, _pausado ? "#131# Continuar" : "#132# Pausar"))
         _pausado = !_pausado;
     y += 48;
@@ -305,13 +319,13 @@ void Simulation::drawUI()
     GuiLine({px, y, panelW, 10}, nullptr);
     y += 22;
 
-    drawSlider(px, y, panelW, "Bacterias", &_configBacterias, 0.0f, 2000.0f, "");
+    drawSlider(px, y, panelW, "Bacterias", &_configBacterias, 0.0f, 3000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Comida", &_configComida, 0.0f, 1000.0f, "");
+    drawSlider(px, y, panelW, "Comida", &_configComida, 0.0f, 2000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Veneno", &_configVeneno, 0.0f, 500.0f, "");
+    drawSlider(px, y, panelW, "Veneno", &_configVeneno, 0.0f, 1000.0f, "");
     y += 54;
 
     drawSlider(px, y, panelW, "Velocidade", &_velocidadeMs, 1.0f, 200.0f, "ms");
@@ -322,19 +336,19 @@ void Simulation::drawUI()
     _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0x999999, "Caracteristicas das bacterias");
     y += 26;
 
-    drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 300.0f, "");
+    drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 2000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Vida maxima (idade)", &_vidaMaxima, 20.0f, 1000.0f, "");
+    drawSlider(px, y, panelW, "Vida maxima (idade)", &_vidaMaxima, 20.0f, 5000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 50.0f, "");
+    drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 200.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Dano do veneno", &_danoVeneno, 1.0f, 50.0f, "");
+    drawSlider(px, y, panelW, "Dano do veneno", &_danoVeneno, 1.0f, 200.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Limite reproducao", &_limiteReproducao, 50.0f, 400.0f, "");
+    drawSlider(px, y, panelW, "Limite reproducao", &_limiteReproducao, 50.0f, 3000.0f, "");
     y += 60;
 
     if (GuiButton({px, y, panelW, 32}, "#68# Centrar vista"))
@@ -363,6 +377,9 @@ void Simulation::drawUI()
 
     snprintf(buf, sizeof(buf), "Veneno no mapa: %d", static_cast<int>(_veneno.size()));
     _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0xAA00FF, buf);
+    y += 30;
+
+    EndScissorMode();
 }
 
 void Simulation::tick()
