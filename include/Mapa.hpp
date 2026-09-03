@@ -12,6 +12,10 @@ class Mapa
         int                                 _height;
         std::vector<std::pair<int, int> >   _bacterias;
         std::vector<std::pair<int, int> >   _comida;
+        std::vector<std::pair<int, int> >   _veneno;
+
+        std::pair<int, int> gerarPosicao(const std::string &modo, int raio);
+        void gerarBloco(std::vector<std::pair<int, int> > &alvo, int count, const std::string &modo, int raio);
 
     public:
         Mapa(const std::string &path);
@@ -20,6 +24,7 @@ class Mapa
         int getHeight() const;
         const std::vector<std::pair<int, int> > &getBacterias() const;
         const std::vector<std::pair<int, int> > &getComida() const;
+        const std::vector<std::pair<int, int> > &getVeneno() const;
 };
 
 #endif

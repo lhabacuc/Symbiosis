@@ -6,7 +6,7 @@
 # include "Visualizer.hpp"
 # include "Mapa.hpp"
 
-struct Comida
+struct Item
 {
     int x;
     int y;
@@ -17,9 +17,11 @@ class Simulation
     private:
         Visualizer              &_viz;
         std::vector<Bacteria>    _bacterias;
-        std::vector<Comida>      _comida;
+        std::vector<Item>        _comida;
+        std::vector<Item>        _veneno;
 
         void spawnComida(int n);
+        void spawnVeneno(int n);
         void update();
         void draw();
 
