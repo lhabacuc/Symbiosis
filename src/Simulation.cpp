@@ -9,7 +9,7 @@
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _mapa(mapa), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
       _pausado(false), _velocidadeMs(50.0f),
-      _energiaInicial(90.0f), _vidaMaxima(150.0f), _valorComida(10.0f),
+      _energiaInicial(90.0f), _vidaMaxima(250.0f), _valorComida(10.0f),
       _danoVeneno(6.0f), _limiteReproducao(130.0f),
       _gregarismo(false), _raioSocial(80.0f), _custoSolidao(3.0f),
       _acumulador(0.0f), _scrollX(0.0f), _scrollY(0.0f)
@@ -488,13 +488,13 @@ void Simulation::drawUI()
     drawSlider(px, y, panelW, "Bacterias", &_configBacterias, 0.0f, 3000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Comida", &_configComida, 0.0f, 2000.0f, "");
+    drawSlider(px, y, panelW, "Comida", &_configComida, 0.0f, 4000.0f, "");
     y += 54;
 
     drawSlider(px, y, panelW, "Veneno", &_configVeneno, 0.0f, 1000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Velocidade", &_velocidadeMs, 1.0f, 200.0f, "ms");
+    drawSlider(px, y, panelW, "Velocidade", &_velocidadeMs, 1.0f, 400.0f, "ms");
     y += 60;
 
     GuiLine({px, y, panelW, 10}, nullptr);
@@ -502,16 +502,16 @@ void Simulation::drawUI()
     _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0x999999, "Caracteristicas das bacterias");
     y += 26;
 
-    drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 2000.0f, "");
+    drawSlider(px, y, panelW, "Energia inicial", &_energiaInicial, 10.0f, 4000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Vida maxima (idade)", &_vidaMaxima, 20.0f, 5000.0f, "");
+    drawSlider(px, y, panelW, "Vida maxima (idade)", &_vidaMaxima, 20.0f, 9000.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 200.0f, "");
+    drawSlider(px, y, panelW, "Valor da comida", &_valorComida, 1.0f, 400.0f, "");
     y += 54;
 
-    drawSlider(px, y, panelW, "Dano do veneno", &_danoVeneno, 1.0f, 200.0f, "");
+    drawSlider(px, y, panelW, "Dano do veneno", &_danoVeneno, 1.0f, 400.0f, "");
     y += 54;
 
     drawSlider(px, y, panelW, "Limite reproducao", &_limiteReproducao, 50.0f, 3000.0f, "");
