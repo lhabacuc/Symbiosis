@@ -6,7 +6,7 @@ Cada bactéria é um `SerVivo` com genes próprios (velocidade, raio de visão, 
 
 ## Demonstração
 
-![Demonstração da simulação](demo/demo.gif)
+<img src="demo/demo.gif" alt="Demonstração da simulação" width="100%" />
 
 > Vídeo original em qualidade completa: [`demo/video01.webm`](demo/video01.webm).
 
