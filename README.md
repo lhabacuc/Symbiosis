@@ -6,9 +6,9 @@ Cada bactéria é um `SerVivo` com genes próprios (velocidade, raio de visão, 
 
 ## Demonstração
 
-https://github.com/lhabacuc/Symbiosis/raw/main/demo/video01.webm
+![Demonstração da simulação](demo/demo.gif)
 
-> O GitHub nem sempre reproduz vídeos `.webm` diretamente na página do README — se não aparecer um player acima, faz clique no link para descarregar/reproduzir, ou vê o ficheiro em [`demo/video01.webm`](demo/video01.webm).
+> Vídeo original em qualidade completa: [`demo/video01.webm`](demo/video01.webm).
 
 ## Funcionalidades
 
