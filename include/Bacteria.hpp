@@ -11,7 +11,7 @@ class Bacteria : public SerVivo
     float genePreferencia;
     float geneDirecaoPreferida;
 
-    static constexpr float LIMITE_REPRODUCAO = 100.0f;
+    static constexpr float LIMITE_REPRODUCAO = 500.0f;
 
     public:
         Bacteria(int x, int y);

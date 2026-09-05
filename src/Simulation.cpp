@@ -7,7 +7,7 @@
 #include <cmath>
 
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
-    : _viz(viz), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
+    : _viz(viz), _mapa(mapa), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()),
       _pausado(false), _velocidadeMs(50.0f),
       _energiaInicial(90.0f), _vidaMaxima(150.0f), _valorComida(10.0f),
       _danoVeneno(6.0f), _limiteReproducao(130.0f),
@@ -29,32 +29,7 @@ Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     if (mapa.getBacteriaVidaMaxima() >= 0.0f)
         _vidaMaxima = mapa.getBacteriaVidaMaxima();
 
-    const std::vector<std::pair<int, int> > &bacterias = mapa.getBacterias();
-    for (size_t i = 0; i < bacterias.size(); i++)
-    {
-        Bacteria b(bacterias[i].first, bacterias[i].second);
-        b.setEnergy(_energiaInicial);
-        b.setIdadeMaxima(static_cast<int>(_vidaMaxima));
-        _bacterias.push_back(b);
-    }
-
-    const std::vector<std::pair<int, int> > &comida = mapa.getComida();
-    for (size_t i = 0; i < comida.size(); i++)
-    {
-        Item c;
-        c.x = comida[i].first;
-        c.y = comida[i].second;
-        _comida.push_back(c);
-    }
-
-    const std::vector<std::pair<int, int> > &veneno = mapa.getVeneno();
-    for (size_t i = 0; i < veneno.size(); i++)
-    {
-        Item v;
-        v.x = veneno[i].first;
-        v.y = veneno[i].second;
-        _veneno.push_back(v);
-    }
+    carregarDeMapa();
 
     aplicarEstilo();
 }
@@ -139,15 +114,48 @@ void Simulation::sincronizarPopulacao()
     _ultimoConfigBacterias = _configBacterias;
 }
 
-void Simulation::reiniciar()
+void Simulation::carregarDeMapa()
 {
     _bacterias.clear();
     _comida.clear();
     _veneno.clear();
-    spawnBacterias(static_cast<int>(_configBacterias));
-    spawnComida(static_cast<int>(_configComida));
-    spawnVeneno(static_cast<int>(_configVeneno));
+
+    const std::vector<std::pair<int, int> > &bacterias = _mapa.getBacterias();
+    for (size_t i = 0; i < bacterias.size(); i++)
+    {
+        Bacteria b(bacterias[i].first, bacterias[i].second);
+        b.setEnergy(_energiaInicial);
+        b.setIdadeMaxima(static_cast<int>(_vidaMaxima));
+        _bacterias.push_back(b);
+    }
+
+    const std::vector<std::pair<int, int> > &comida = _mapa.getComida();
+    for (size_t i = 0; i < comida.size(); i++)
+    {
+        Item c;
+        c.x = comida[i].first;
+        c.y = comida[i].second;
+        _comida.push_back(c);
+    }
+
+    const std::vector<std::pair<int, int> > &veneno = _mapa.getVeneno();
+    for (size_t i = 0; i < veneno.size(); i++)
+    {
+        Item v;
+        v.x = veneno[i].first;
+        v.y = veneno[i].second;
+        _veneno.push_back(v);
+    }
+
+    _configBacterias = static_cast<float>(_bacterias.size());
+    _configComida = static_cast<float>(_comida.size());
+    _configVeneno = static_cast<float>(_veneno.size());
     _ultimoConfigBacterias = _configBacterias;
+}
+
+void Simulation::reiniciar()
+{
+    carregarDeMapa();
     _pausado = false;
 }
 

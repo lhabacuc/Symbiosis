@@ -22,7 +22,7 @@ class SerVivo
     
     public:
         SerVivo();
-        SerVivo(int x, int y, float energia = 50.0f, int idadeMaxima = 100);
+        SerVivo(int x, int y, float energia = 50.0f, int idadeMaxima = 4000);
         SerVivo(const SerVivo &other);
         virtual ~SerVivo();
         SerVivo &operator=(const SerVivo &other);

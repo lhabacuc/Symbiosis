@@ -21,6 +21,7 @@ class Simulation
 
     private:
         Visualizer              &_viz;
+        Mapa                     _mapa;
         int                      _playWidth;
         int                      _playHeight;
 
@@ -64,6 +65,7 @@ class Simulation
         void spawnComida(int n);
         void spawnVeneno(int n);
         void spawnBacterias(int n);
+        void carregarDeMapa();
         void reiniciar();
         void limpar();
 
