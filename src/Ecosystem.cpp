@@ -237,31 +237,30 @@ void Ecosystem::update()
             }
         });
 
-        // procura de comida no raio de visao
+        // quimiotaxia: em vez de apontar diretamente ao alvo (o que seria uma bacteria
+        // "omnisciente"), sente-se a concentracao de "cheiro" de comida no raio de visao
+        // (soma de 1/distancia de cada item proximo) e reage por tentativa em
+        // Bacteria::moverQuimiotaxia - tal como bacterias reais fazem run-and-tumble.
         float raio = b.getRaioVisaoPixels();
         float raio2 = raio * raio;
-        float melhorDist2 = -1.0f;
-        int melhorX = 0;
-        int melhorY = 0;
+        float concentracao = 0.0f;
 
         _gradeComida.paraCadaVizinho(bx, by, raio, [&](int j)
         {
             float dx = static_cast<float>(bx - _comida[j].x);
             float dy = static_cast<float>(by - _comida[j].y);
             float dist2 = dx * dx + dy * dy;
-            if (dist2 <= raio2 && (melhorDist2 < 0.0f || dist2 < melhorDist2))
-            {
-                melhorDist2 = dist2;
-                melhorX = _comida[j].x;
-                melhorY = _comida[j].y;
-            }
+            if (dist2 <= raio2)
+                concentracao += 1.0f / (1.0f + std::sqrt(dist2));
         });
 
-        if (melhorDist2 >= 0.0f)
+        if (concentracao > 0.0f)
         {
-            b.moverPara(melhorX, melhorY);
+            b.moverQuimiotaxia(concentracao);
             continue;
         }
+
+        b.resetSinalQuimico();
 
         if (!_config.gregarismo)
         {
