@@ -1,10 +1,10 @@
 #ifndef SIMULATION_HPP
 # define SIMULATION_HPP
 
-# include <string>
 # include "Visualizer.hpp"
 # include "Mapa.hpp"
 # include "Ecosystem.hpp"
+# include "UIPanel.hpp"
 
 class Simulation
 {
@@ -14,17 +14,12 @@ class Simulation
     private:
         Visualizer   &_viz;
         Ecosystem     _ecosystem;
+        UIPanel       _ui;
 
         bool          _pausado;
         float         _acumulador;
 
-        float         _scrollX;
-        float         _scrollY;
-
-        void aplicarEstilo();
         void draw();
-        void drawUI();
-        void drawSlider(float x, float y, float w, const char *label, float *value, float minV, float maxV, const char *suffix);
 
     public:
         Simulation(Visualizer &viz, const Mapa &mapa);

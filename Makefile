@@ -11,6 +11,7 @@ SRC = src/main.cpp \
       src/Bacteria.cpp \
       src/Visualizer.cpp \
       src/Ecosystem.cpp \
+      src/UIPanel.cpp \
       src/Simulation.cpp \
       src/Mapa.cpp
 
