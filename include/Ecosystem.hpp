@@ -60,7 +60,6 @@ class Ecosystem
         void spawnVeneno(int n);
         void spawnBacterias(int n);
         void resolverSobreposicoes();
-        float temperaturaEm(int x, int y) const;
 
     public:
         explicit Ecosystem(const Mapa &mapa);
@@ -71,6 +70,7 @@ class Ecosystem
         int getPlayWidth() const;
         int getPlayHeight() const;
         bool desenhoDetalhado() const;
+        float temperaturaEm(int x, int y) const;
 
         const std::vector<Bacteria> &getBacterias() const;
         const std::vector<Item> &getComida() const;
