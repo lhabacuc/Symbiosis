@@ -10,6 +10,7 @@ SRC = src/main.cpp \
       src/SerVivo.cpp \
       src/Bacteria.cpp \
       src/Visualizer.cpp \
+      src/Ecosystem.cpp \
       src/Simulation.cpp \
       src/Mapa.cpp
 
