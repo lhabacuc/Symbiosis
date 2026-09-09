@@ -50,10 +50,10 @@ bool Visualizer::shouldClose() const
     return WindowShouldClose();
 }
 
-void Visualizer::beginFrame()
+void Visualizer::beginFrame(unsigned int corFundoRGB)
 {
     BeginDrawing();
-    ClearBackground(BLACK);
+    ClearBackground(toColor(corFundoRGB));
 }
 
 void Visualizer::endFrame()
@@ -87,6 +87,11 @@ void Visualizer::drawBacteria(float x, float y, float radius, unsigned int color
     DrawCircleLinesV({x, y}, radius, corBorda);
     DrawCircleV({x - radius * 0.35f, y - radius * 0.35f}, radius * 0.32f, corBrilho);
     DrawCircleV({x + radius * 0.25f, y + radius * 0.15f}, radius * 0.28f, corNucleo);
+}
+
+void Visualizer::drawZonaTemperatura(float x, float y, float raio, unsigned int colorRGB, float alpha)
+{
+    DrawCircleV({x, y}, raio, Fade(toColor(colorRGB), alpha));
 }
 
 void Visualizer::setCameraCenter(float x, float y)

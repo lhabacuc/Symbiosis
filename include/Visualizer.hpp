@@ -20,13 +20,14 @@ class Visualizer
         int getHeight() const;
 
         bool shouldClose() const;
-        void beginFrame();
+        void beginFrame(unsigned int corFundoRGB = 0x000000);
         void endFrame();
 
         void drawRect(int x, int y, int w, int h, unsigned int colorRGB);
         void drawText(int x, int y, unsigned int colorRGB, const char *text);
         void drawLine(int x1, int y1, int x2, int y2, unsigned int colorRGB);
         void drawBacteria(float x, float y, float radius, unsigned int colorRGB);
+        void drawZonaTemperatura(float x, float y, float raio, unsigned int colorRGB, float alpha);
 
         void setCameraCenter(float x, float y);
         void updateCamera(float regiaoW, float regiaoH);
