@@ -50,7 +50,7 @@ void UIPanel::drawSlider(float x, float y, float w, const char *label, float *va
 
 void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
 {
-    const float contentH = 1400.0f;
+    const float contentH = 1520.0f;
     int playWidth = ecosystem.getPlayWidth();
     EcosystemConfig &cfg = ecosystem.config();
 
@@ -169,6 +169,14 @@ void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
     snprintf(buf, sizeof(buf), "Veneno no mapa: %d", static_cast<int>(ecosystem.getVeneno().size()));
     _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0xAA00FF, buf);
     y += 30;
+
+    GuiLine({px, y, panelW, 10}, nullptr);
+    y += 8;
+    _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0x999999, "Populacao ao longo do tempo");
+    y += 22;
+
+    _viz.drawGrafico(px, y, panelW, 100.0f, ecosystem.getHistoricoPopulacao(), 0x00FF00);
+    y += 116;
 
     EndScissorMode();
 }
