@@ -94,6 +94,33 @@ void Visualizer::drawZonaTemperatura(float x, float y, float raio, unsigned int 
     DrawCircleV({x, y}, raio, Fade(toColor(colorRGB), alpha));
 }
 
+void Visualizer::drawGrafico(float x, float y, float w, float h, const std::vector<float> &valores, unsigned int colorRGB)
+{
+    DrawRectangle(static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h), Fade(BLACK, 0.35f));
+    DrawRectangleLines(static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h), Fade(WHITE, 0.25f));
+
+    if (valores.size() < 2)
+        return;
+
+    float maxValor = valores[0];
+    for (size_t i = 1; i < valores.size(); i++)
+        if (valores[i] > maxValor)
+            maxValor = valores[i];
+    if (maxValor < 1.0f)
+        maxValor = 1.0f;
+
+    std::vector<Vector2> pontos;
+    pontos.reserve(valores.size());
+    for (size_t i = 0; i < valores.size(); i++)
+    {
+        float px = x + (w * static_cast<float>(i)) / static_cast<float>(valores.size() - 1);
+        float py = y + h - (valores[i] / maxValor) * h;
+        pontos.push_back({px, py});
+    }
+
+    DrawLineStrip(pontos.data(), static_cast<int>(pontos.size()), toColor(colorRGB));
+}
+
 void Visualizer::setCameraCenter(float x, float y)
 {
     _camera.target = {x, y};

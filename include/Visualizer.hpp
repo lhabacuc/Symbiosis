@@ -1,6 +1,7 @@
 #ifndef VISUALIZER_HPP
 # define VISUALIZER_HPP
 
+# include <vector>
 # include "raylib.h"
 
 class Visualizer
@@ -28,6 +29,7 @@ class Visualizer
         void drawLine(int x1, int y1, int x2, int y2, unsigned int colorRGB);
         void drawBacteria(float x, float y, float radius, unsigned int colorRGB);
         void drawZonaTemperatura(float x, float y, float raio, unsigned int colorRGB, float alpha);
+        void drawGrafico(float x, float y, float w, float h, const std::vector<float> &valores, unsigned int colorRGB);
 
         void setCameraCenter(float x, float y);
         void updateCamera(float regiaoW, float regiaoH);
