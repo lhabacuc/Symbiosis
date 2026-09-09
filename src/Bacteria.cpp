@@ -7,9 +7,14 @@ static float anguloAleatorio()
     return static_cast<float>(rand() % 628) / 100.0f; // 0 a ~2*PI
 }
 
+static float temperaturaAleatoria()
+{
+    return static_cast<float>(rand() % 30 + 5); // entre 5 e 34 graus
+}
+
 Bacteria::Bacteria(int x, int y)
     : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f),
-      geneDirecaoPreferida(anguloAleatorio()),
+      geneDirecaoPreferida(anguloAleatorio()), geneTemperaturaOtima(temperaturaAleatoria()),
       _headingQuimiotaxia(anguloAleatorio()), _concentracaoAnterior(0.0f)
 {
 }
@@ -17,13 +22,14 @@ Bacteria::Bacteria(int x, int y)
 Bacteria::Bacteria(const Bacteria &other, float genePreference)
     : SerVivo(other), geneVelocidade(other.geneVelocidade), geneRaioVisao(other.geneRaioVisao),
       genePreferencia(genePreference), geneDirecaoPreferida(other.geneDirecaoPreferida),
+      geneTemperaturaOtima(other.geneTemperaturaOtima),
       _headingQuimiotaxia(other._headingQuimiotaxia), _concentracaoAnterior(0.0f)
 {
 }
 
 Bacteria::Bacteria(int posX, int posY, float maeVelocidade, float maeVisao, float maePreferencia)
     : SerVivo(posX, posY), geneVelocidade(maeVelocidade), geneRaioVisao(maeVisao), genePreferencia(maePreferencia),
-      geneDirecaoPreferida(anguloAleatorio()),
+      geneDirecaoPreferida(anguloAleatorio()), geneTemperaturaOtima(temperaturaAleatoria()),
       _headingQuimiotaxia(anguloAleatorio()), _concentracaoAnterior(0.0f)
 {
     if (rand() % 100 < 15) // 15% de chance de mutacao
@@ -83,9 +89,19 @@ float Bacteria::getDirecaoPreferida() const
     return geneDirecaoPreferida;
 }
 
+float Bacteria::getGeneTemperaturaOtima() const
+{
+    return geneTemperaturaOtima;
+}
+
 void Bacteria::setDirecaoPreferida(float direcao)
 {
     geneDirecaoPreferida = direcao;
+}
+
+void Bacteria::setGeneTemperaturaOtima(float valor)
+{
+    geneTemperaturaOtima = valor;
 }
 
 bool Bacteria::podeSeDividir() const
@@ -176,6 +192,16 @@ void Bacteria::resetSinalQuimico()
     _concentracaoAnterior = 0.0f;
 }
 
+void Bacteria::aplicarTemperatura(float temperaturaLocal)
+{
+    // quanto mais longe a temperatura do meio estiver do "otimo" da bacteria,
+    // maior o custo de energia - tal como bacterias reais fora da sua faixa
+    // termica ideal. Com mutacao no gene, a populacao acaba por se adaptar
+    // as zonas quentes/frias onde efetivamente sobrevive.
+    float diferenca = std::fabs(temperaturaLocal - geneTemperaturaOtima);
+    setEnergy(getEnergy() - diferenca * 0.4f);
+}
+
 void Bacteria::empurrar(int dx, int dy)
 {
     x += dx;
@@ -216,6 +242,11 @@ Bacteria Bacteria::divide()
     if (rand() % 100 < 15) // 15% de chance de mutacao na direcao preferida
         direcao += (static_cast<float>(rand() % 200) - 100.0f) / 100.0f;
     filha.setDirecaoPreferida(direcao);
+
+    float temperaturaOtima = geneTemperaturaOtima;
+    if (rand() % 100 < 15) // 15% de chance de mutacao na temperatura otima
+        temperaturaOtima += (static_cast<float>(rand() % 400) - 200.0f) / 100.0f;
+    filha.setGeneTemperaturaOtima(temperaturaOtima);
 
     return filha;
 }

@@ -10,6 +10,7 @@ class Bacteria : public SerVivo
     float geneRaioVisao;
     float genePreferencia;
     float geneDirecaoPreferida;
+    float geneTemperaturaOtima;
 
     float _headingQuimiotaxia;
     float _concentracaoAnterior;
@@ -27,6 +28,7 @@ class Bacteria : public SerVivo
         void moverPara(int tx, int ty);
         void moverQuimiotaxia(float concentracao);
         void resetSinalQuimico();
+        void aplicarTemperatura(float temperaturaLocal);
         void empurrar(int dx, int dy);
         int getPasso() const;
         float getRaioVisaoPixels() const;
@@ -37,6 +39,8 @@ class Bacteria : public SerVivo
         float getGeneRaioVisao() const;
         float getGenePreferencia() const;
         float getDirecaoPreferida() const;
+        float getGeneTemperaturaOtima() const;
+        void setGeneTemperaturaOtima(float valor);
         void setDirecaoPreferida(float direcao);
         void interagirComItem(TipoItem item);
         void setPreference(float genePreference);
