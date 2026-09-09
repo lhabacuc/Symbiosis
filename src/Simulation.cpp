@@ -2,6 +2,42 @@
 #include "raylib.h"
 #include <algorithm>
 
+// mapeia uma temperatura para uma cor: azulado no frio, avermelhado no quente,
+// cinzento neutro a volta dos ~20 graus (usado tanto no fundo como nas zonas)
+static unsigned int corTemperatura(float temperatura)
+{
+    float t = (temperatura - 20.0f) / 20.0f;
+    if (t < -1.0f)
+        t = -1.0f;
+    if (t > 1.0f)
+        t = 1.0f;
+
+    unsigned char r, g, b;
+    if (t < 0.0f)
+    {
+        float k = -t;
+        r = static_cast<unsigned char>(80 + (1.0f - k) * 40);
+        g = static_cast<unsigned char>(80 + (1.0f - k) * 40);
+        b = static_cast<unsigned char>(80 + k * 175);
+    }
+    else
+    {
+        float k = t;
+        r = static_cast<unsigned char>(80 + k * 175);
+        g = static_cast<unsigned char>(80 + (1.0f - k) * 40);
+        b = static_cast<unsigned char>(80 + (1.0f - k) * 40);
+    }
+    return (static_cast<unsigned int>(r) << 16) | (static_cast<unsigned int>(g) << 8) | static_cast<unsigned int>(b);
+}
+
+static unsigned int escurecer(unsigned int colorRGB, float fator)
+{
+    unsigned char r = static_cast<unsigned char>(((colorRGB >> 16) & 0xFF) * fator);
+    unsigned char g = static_cast<unsigned char>(((colorRGB >> 8) & 0xFF) * fator);
+    unsigned char b = static_cast<unsigned char>((colorRGB & 0xFF) * fator);
+    return (static_cast<unsigned int>(r) << 16) | (static_cast<unsigned int>(g) << 8) | static_cast<unsigned int>(b);
+}
+
 Simulation::Simulation(Visualizer &viz, const Mapa &mapa)
     : _viz(viz), _ecosystem(mapa), _ui(viz, SIDEBAR_WIDTH),
       _pausado(false), _acumulador(0.0f)
@@ -15,6 +51,14 @@ void Simulation::draw()
 
     _viz.updateCamera(static_cast<float>(playWidth), static_cast<float>(_viz.getHeight()));
     _viz.beginScissorCamera(0, 0, playWidth, _viz.getHeight());
+
+    const std::vector<ZonaTemperatura> &zonas = _ecosystem.getZonasTemperatura();
+    for (size_t i = 0; i < zonas.size(); i++)
+    {
+        const ZonaTemperatura &zona = zonas[i];
+        _viz.drawZonaTemperatura(static_cast<float>(zona.x), static_cast<float>(zona.y),
+            static_cast<float>(zona.raio), corTemperatura(zona.valor), 0.35f);
+    }
 
     const std::vector<Item> &comida = _ecosystem.getComida();
     for (size_t i = 0; i < comida.size(); i++)
@@ -73,7 +117,8 @@ void Simulation::tick()
     if (_acumulador > dt)
         _acumulador = dt;
 
-    _viz.beginFrame();
+    unsigned int corFundo = escurecer(corTemperatura(_ecosystem.config().temperaturaAmbiente), 0.3f);
+    _viz.beginFrame(corFundo);
     draw();
     _ui.draw(_ecosystem, _pausado);
     _viz.endFrame();
