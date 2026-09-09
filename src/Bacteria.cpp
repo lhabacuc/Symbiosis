@@ -9,19 +9,22 @@ static float anguloAleatorio()
 
 Bacteria::Bacteria(int x, int y)
     : SerVivo(x, y), geneVelocidade(0.3f), geneRaioVisao(0.3f), genePreferencia(0.5f),
-      geneDirecaoPreferida(anguloAleatorio())
+      geneDirecaoPreferida(anguloAleatorio()),
+      _headingQuimiotaxia(anguloAleatorio()), _concentracaoAnterior(0.0f)
 {
 }
 
 Bacteria::Bacteria(const Bacteria &other, float genePreference)
     : SerVivo(other), geneVelocidade(other.geneVelocidade), geneRaioVisao(other.geneRaioVisao),
-      genePreferencia(genePreference), geneDirecaoPreferida(other.geneDirecaoPreferida)
+      genePreferencia(genePreference), geneDirecaoPreferida(other.geneDirecaoPreferida),
+      _headingQuimiotaxia(other._headingQuimiotaxia), _concentracaoAnterior(0.0f)
 {
 }
 
 Bacteria::Bacteria(int posX, int posY, float maeVelocidade, float maeVisao, float maePreferencia)
     : SerVivo(posX, posY), geneVelocidade(maeVelocidade), geneRaioVisao(maeVisao), genePreferencia(maePreferencia),
-      geneDirecaoPreferida(anguloAleatorio())
+      geneDirecaoPreferida(anguloAleatorio()),
+      _headingQuimiotaxia(anguloAleatorio()), _concentracaoAnterior(0.0f)
 {
     if (rand() % 100 < 15) // 15% de chance de mutacao
     {
@@ -144,6 +147,33 @@ void Bacteria::moverPara(int tx, int ty)
         y += std::min(passo, dy);
     else if (dy < 0)
         y += std::max(-passo, dy);
+}
+
+void Bacteria::moverQuimiotaxia(float concentracao)
+{
+    // run-and-tumble: em vez de apontar diretamente ao alvo, a bacteria compara a
+    // concentracao "sentida" agora com a do instante anterior. Se melhorou, tende a
+    // manter o rumo (run); se piorou ou esta parada, tumba para um rumo novo com
+    // mais frequencia - tal como bacterias reais fazem quimiotaxia por tentativa.
+    bool melhorou = concentracao > _concentracaoAnterior + 0.01f;
+    bool piorou = concentracao < _concentracaoAnterior - 0.01f;
+    float probTumble = melhorou ? 0.05f : (piorou ? 0.6f : 0.25f);
+
+    if ((static_cast<float>(rand() % 1000) / 1000.0f) < probTumble)
+        _headingQuimiotaxia = anguloAleatorio();
+    else
+        _headingQuimiotaxia += (static_cast<float>(rand() % 100) / 100.0f - 0.5f) * 0.4f;
+
+    int passo = getPasso();
+    x += static_cast<int>(std::cos(_headingQuimiotaxia) * passo);
+    y += static_cast<int>(std::sin(_headingQuimiotaxia) * passo);
+
+    _concentracaoAnterior = concentracao;
+}
+
+void Bacteria::resetSinalQuimico()
+{
+    _concentracaoAnterior = 0.0f;
 }
 
 void Bacteria::empurrar(int dx, int dy)

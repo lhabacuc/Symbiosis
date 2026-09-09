@@ -11,6 +11,9 @@ class Bacteria : public SerVivo
     float genePreferencia;
     float geneDirecaoPreferida;
 
+    float _headingQuimiotaxia;
+    float _concentracaoAnterior;
+
     static constexpr float LIMITE_REPRODUCAO = 500.0f;
 
     public:
@@ -22,6 +25,8 @@ class Bacteria : public SerVivo
         void moverAleatorio();
         void moverPreferido();
         void moverPara(int tx, int ty);
+        void moverQuimiotaxia(float concentracao);
+        void resetSinalQuimico();
         void empurrar(int dx, int dy);
         int getPasso() const;
         float getRaioVisaoPixels() const;
