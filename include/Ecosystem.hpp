@@ -51,6 +51,9 @@ class Ecosystem
 
         std::vector<ZonaTemperatura> _zonasTemperatura;
 
+        std::vector<float>       _historicoPopulacao;
+        int                      _ticksDesdeAmostra;
+
         EcosystemConfig          _config;
 
         void spawnComida(int n);
@@ -73,6 +76,7 @@ class Ecosystem
         const std::vector<Item> &getComida() const;
         const std::vector<Item> &getVeneno() const;
         const std::vector<ZonaTemperatura> &getZonasTemperatura() const;
+        const std::vector<float> &getHistoricoPopulacao() const;
 
         void sincronizarPopulacao();
         void carregarDeMapa();

@@ -4,7 +4,7 @@
 #include <cmath>
 
 Ecosystem::Ecosystem(const Mapa &mapa)
-    : _mapa(mapa), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight())
+    : _mapa(mapa), _playWidth(mapa.getWidth()), _playHeight(mapa.getHeight()), _ticksDesdeAmostra(0)
 {
     _desenhoDetalhado = true;
     _gradeComida.configurar(_playWidth, _playHeight, 24);
@@ -80,6 +80,11 @@ const std::vector<Item> &Ecosystem::getVeneno() const
 const std::vector<ZonaTemperatura> &Ecosystem::getZonasTemperatura() const
 {
     return _zonasTemperatura;
+}
+
+const std::vector<float> &Ecosystem::getHistoricoPopulacao() const
+{
+    return _historicoPopulacao;
 }
 
 float Ecosystem::temperaturaEm(int x, int y) const
@@ -190,6 +195,8 @@ void Ecosystem::carregarDeMapa()
 void Ecosystem::reiniciar()
 {
     carregarDeMapa();
+    _historicoPopulacao.clear();
+    _ticksDesdeAmostra = 0;
 }
 
 void Ecosystem::limpar()
@@ -198,6 +205,8 @@ void Ecosystem::limpar()
     _comida.clear();
     _veneno.clear();
     _config.ultimoConfigBacterias = 0.0f;
+    _historicoPopulacao.clear();
+    _ticksDesdeAmostra = 0;
 }
 
 void Ecosystem::update()
@@ -382,6 +391,19 @@ void Ecosystem::update()
     }
 
     _desenhoDetalhado = _bacterias.size() <= 3000;
+
+    // amostra a populacao de tempos a tempos (nao a cada tick) para o historico
+    // do grafico nao encher demasiado depressa nem pesar no desempenho
+    const int TICKS_POR_AMOSTRA = 10;
+    const size_t HISTORICO_MAX = 200;
+    _ticksDesdeAmostra++;
+    if (_ticksDesdeAmostra >= TICKS_POR_AMOSTRA)
+    {
+        _ticksDesdeAmostra = 0;
+        _historicoPopulacao.push_back(static_cast<float>(_bacterias.size()));
+        if (_historicoPopulacao.size() > HISTORICO_MAX)
+            _historicoPopulacao.erase(_historicoPopulacao.begin());
+    }
 }
 
 void Ecosystem::resolverSobreposicoes()
