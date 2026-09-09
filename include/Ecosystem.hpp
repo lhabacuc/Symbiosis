@@ -29,6 +29,8 @@ struct EcosystemConfig
     bool  gregarismo;
     float raioSocial;
     float custoSolidao;
+
+    float temperaturaAmbiente;
 };
 
 class Ecosystem
@@ -47,12 +49,15 @@ class Ecosystem
         GradeEspacial            _gradeBacterias;
         bool                     _desenhoDetalhado;
 
+        std::vector<ZonaTemperatura> _zonasTemperatura;
+
         EcosystemConfig          _config;
 
         void spawnComida(int n);
         void spawnVeneno(int n);
         void spawnBacterias(int n);
         void resolverSobreposicoes();
+        float temperaturaEm(int x, int y) const;
 
     public:
         explicit Ecosystem(const Mapa &mapa);
@@ -67,6 +72,7 @@ class Ecosystem
         const std::vector<Bacteria> &getBacterias() const;
         const std::vector<Item> &getComida() const;
         const std::vector<Item> &getVeneno() const;
+        const std::vector<ZonaTemperatura> &getZonasTemperatura() const;
 
         void sincronizarPopulacao();
         void carregarDeMapa();

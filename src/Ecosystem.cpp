@@ -21,6 +21,9 @@ Ecosystem::Ecosystem(const Mapa &mapa)
     _config.raioSocial = 80.0f;
     _config.custoSolidao = 3.0f;
 
+    _config.temperaturaAmbiente = 20.0f;
+    _zonasTemperatura = mapa.getZonasTemperatura();
+
     _config.configBacterias = static_cast<float>(mapa.getBacterias().size());
     _config.configComida = static_cast<float>(mapa.getComida().size());
     _config.configVeneno = static_cast<float>(mapa.getVeneno().size());
@@ -72,6 +75,24 @@ const std::vector<Item> &Ecosystem::getComida() const
 const std::vector<Item> &Ecosystem::getVeneno() const
 {
     return _veneno;
+}
+
+const std::vector<ZonaTemperatura> &Ecosystem::getZonasTemperatura() const
+{
+    return _zonasTemperatura;
+}
+
+float Ecosystem::temperaturaEm(int x, int y) const
+{
+    for (size_t i = 0; i < _zonasTemperatura.size(); i++)
+    {
+        const ZonaTemperatura &zona = _zonasTemperatura[i];
+        int dx = x - zona.x;
+        int dy = y - zona.y;
+        if (dx * dx + dy * dy <= zona.raio * zona.raio)
+            return zona.valor;
+    }
+    return _config.temperaturaAmbiente;
 }
 
 void Ecosystem::spawnComida(int n)
@@ -208,6 +229,8 @@ void Ecosystem::update()
 
         int bx = b.getX();
         int by = b.getY();
+
+        b.aplicarTemperatura(temperaturaEm(bx, by));
 
         // comida a alcance (consumo) - grelha em vez de varrer todos os itens
         _gradeComida.paraCadaVizinho(bx, by, 8.0f, [&](int j)
