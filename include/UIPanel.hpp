@@ -4,6 +4,16 @@
 # include "Visualizer.hpp"
 # include "Ecosystem.hpp"
 
+enum class ModoVisualizacao
+{
+    NORMAL = 0,
+    TERMICA,
+    GENES,
+    IDADE,
+    DENSIDADE,
+    TOTAL_MODOS
+};
+
 class UIPanel
 {
     private:
@@ -18,7 +28,7 @@ class UIPanel
         UIPanel(Visualizer &viz, int width);
 
         void aplicarEstilo();
-        void draw(Ecosystem &ecosystem, bool &pausado);
+        void draw(Ecosystem &ecosystem, bool &pausado, ModoVisualizacao &modo);
 };
 
 #endif

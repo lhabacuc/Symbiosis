@@ -48,9 +48,9 @@ void UIPanel::drawSlider(float x, float y, float w, const char *label, float *va
     GuiSlider({x, y + 22, w, 20}, nullptr, nullptr, value, minV, maxV);
 }
 
-void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
+void UIPanel::draw(Ecosystem &ecosystem, bool &pausado, ModoVisualizacao &modo)
 {
-    const float contentH = 1520.0f;
+    const float contentH = 1720.0f;
     int playWidth = ecosystem.getPlayWidth();
     EcosystemConfig &cfg = ecosystem.config();
 
@@ -89,6 +89,16 @@ void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
         pausado = true;
     }
     y += 50;
+
+    GuiLine({px, y, panelW, 10}, nullptr);
+    y += 8;
+    _viz.drawText(static_cast<int>(px), static_cast<int>(y), 0x999999, "Filtro de visualizacao (ou TAB)");
+    y += 24;
+
+    int modoInt = static_cast<int>(modo);
+    GuiToggleGroup({px, y, panelW, 26}, "Normal\nTermica\nGenes\nIdade\nDensidade", &modoInt);
+    modo = static_cast<ModoVisualizacao>(modoInt);
+    y += 5 * 32 + 10;
 
     GuiLine({px, y, panelW, 10}, nullptr);
     y += 22;

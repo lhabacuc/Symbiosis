@@ -94,6 +94,11 @@ void Visualizer::drawZonaTemperatura(float x, float y, float raio, unsigned int 
     DrawCircleV({x, y}, raio, Fade(toColor(colorRGB), alpha));
 }
 
+void Visualizer::drawRectAlpha(int x, int y, int w, int h, unsigned int colorRGB, float alpha)
+{
+    DrawRectangle(x, y, w, h, Fade(toColor(colorRGB), alpha));
+}
+
 void Visualizer::drawGrafico(float x, float y, float w, float h, const std::vector<float> &valores, unsigned int colorRGB)
 {
     DrawRectangle(static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h), Fade(BLACK, 0.35f));
