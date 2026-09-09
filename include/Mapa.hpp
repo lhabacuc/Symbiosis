@@ -5,6 +5,14 @@
 # include <vector>
 # include <utility>
 
+struct ZonaTemperatura
+{
+    int   x;
+    int   y;
+    int   raio;
+    float valor;
+};
+
 class Mapa
 {
     private:
@@ -13,6 +21,7 @@ class Mapa
         std::vector<std::pair<int, int> >   _bacterias;
         std::vector<std::pair<int, int> >   _comida;
         std::vector<std::pair<int, int> >   _veneno;
+        std::vector<ZonaTemperatura>         _zonasTemperatura;
 
         float                                _bacteriaVida;
         float                                _bacteriaVidaMaxima;
@@ -28,6 +37,7 @@ class Mapa
         const std::vector<std::pair<int, int> > &getBacterias() const;
         const std::vector<std::pair<int, int> > &getComida() const;
         const std::vector<std::pair<int, int> > &getVeneno() const;
+        const std::vector<ZonaTemperatura> &getZonasTemperatura() const;
         float getBacteriaVida() const;
         float getBacteriaVidaMaxima() const;
 };

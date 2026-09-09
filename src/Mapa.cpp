@@ -14,6 +14,7 @@ Mapa::Mapa(const std::string &path) : _width(0), _height(0), _bacteriaVida(-1.0f
     std::string pendingTipo;
     int pendingCount = 0;
     int pendingRaio = 0;
+    float pendingValor = 0.0f;
 
     std::string linha;
     while (std::getline(file, linha))
@@ -54,26 +55,46 @@ Mapa::Mapa(const std::string &path) : _width(0), _height(0), _bacteriaVida(-1.0f
             pendingRaio = 0;
             iss >> pendingCount;
         }
+        else if (tipo == "TEMPERATURA")
+        {
+            pendingTipo = "TEMPERATURA";
+            iss >> pendingValor >> pendingRaio;
+        }
         else if (tipo == "POSSISION" || tipo == "POSITION")
         {
             std::string modo;
             iss >> modo;
 
-            std::vector<std::pair<int, int> > *alvo = nullptr;
-            if (pendingTipo == "BACTERIA")
-                alvo = &_bacterias;
-            else if (pendingTipo == "COMIDA")
-                alvo = &_comida;
-            else if (pendingTipo == "VENENO")
-                alvo = &_veneno;
+            if (pendingTipo == "TEMPERATURA")
+            {
+                std::pair<int, int> centro = gerarPosicao(modo, pendingRaio);
+                int raio = pendingRaio > 0 ? pendingRaio : std::min(_width, _height) / 4;
+                _zonasTemperatura.push_back({centro.first, centro.second, raio, pendingValor});
+            }
+            else
+            {
+                std::vector<std::pair<int, int> > *alvo = nullptr;
+                if (pendingTipo == "BACTERIA")
+                    alvo = &_bacterias;
+                else if (pendingTipo == "COMIDA")
+                    alvo = &_comida;
+                else if (pendingTipo == "VENENO")
+                    alvo = &_veneno;
 
-            if (alvo)
-                gerarBloco(*alvo, pendingCount, modo, pendingRaio);
+                if (alvo)
+                    gerarBloco(*alvo, pendingCount, modo, pendingRaio);
+            }
             pendingTipo.clear();
         }
     }
 
-    if (!pendingTipo.empty())
+    if (pendingTipo == "TEMPERATURA")
+    {
+        std::pair<int, int> centro = gerarPosicao("rand", pendingRaio);
+        int raio = pendingRaio > 0 ? pendingRaio : std::min(_width, _height) / 4;
+        _zonasTemperatura.push_back({centro.first, centro.second, raio, pendingValor});
+    }
+    else if (!pendingTipo.empty())
     {
         std::vector<std::pair<int, int> > *alvo = nullptr;
         if (pendingTipo == "BACTERIA")
@@ -147,6 +168,11 @@ const std::vector<std::pair<int, int> > &Mapa::getComida() const
 const std::vector<std::pair<int, int> > &Mapa::getVeneno() const
 {
     return _veneno;
+}
+
+const std::vector<ZonaTemperatura> &Mapa::getZonasTemperatura() const
+{
+    return _zonasTemperatura;
 }
 
 float Mapa::getBacteriaVida() const
