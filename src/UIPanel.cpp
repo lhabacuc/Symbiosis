@@ -50,7 +50,7 @@ void UIPanel::drawSlider(float x, float y, float w, const char *label, float *va
 
 void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
 {
-    const float contentH = 1340.0f;
+    const float contentH = 1400.0f;
     int playWidth = ecosystem.getPlayWidth();
     EcosystemConfig &cfg = ecosystem.config();
 
@@ -123,6 +123,9 @@ void UIPanel::draw(Ecosystem &ecosystem, bool &pausado)
     y += 54;
 
     drawSlider(px, y, panelW, "Limite reproducao", &cfg.limiteReproducao, 50.0f, 3000.0f, "");
+    y += 54;
+
+    drawSlider(px, y, panelW, "Temperatura ambiente", &cfg.temperaturaAmbiente, -10.0f, 50.0f, "C");
     y += 60;
 
     GuiLine({px, y, panelW, 10}, nullptr);
